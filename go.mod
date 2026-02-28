@@ -1,0 +1,3 @@
+module gt06_sim
+
+go 1.25.6
