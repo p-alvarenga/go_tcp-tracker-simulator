@@ -2,7 +2,8 @@ package protocol
 
 import (
 	"fmt"
-	"gt06_sim/internal/device"
+
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/device"
 )
 
 type ImeiGenerator struct {

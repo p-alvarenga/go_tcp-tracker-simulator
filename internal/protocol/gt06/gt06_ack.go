@@ -2,7 +2,8 @@ package gt06
 
 import (
 	"encoding/binary"
-	"gt06_sim/internal/protocol"
+
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol"
 )
 
 func ExtractAck(raw []byte) (*AckPacket, bool) {

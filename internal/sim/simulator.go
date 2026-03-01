@@ -2,10 +2,11 @@ package sim
 
 import (
 	"context"
-	"gt06_sim/internal/device"
 	"log/slog"
 	"sync"
 	"time"
+
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/device"
 )
 
 type SimulatorEventType int

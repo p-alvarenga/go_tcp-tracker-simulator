@@ -1,8 +1,9 @@
 package tcp
 
 import (
-	"gt06_sim/internal/protocol/gt06"
 	"log/slog"
+
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
 )
 
 func (c *Client) readLoop() {

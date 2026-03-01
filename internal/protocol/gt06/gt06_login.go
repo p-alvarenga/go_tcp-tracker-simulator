@@ -3,7 +3,8 @@ package gt06
 import (
 	"encoding/binary"
 	"fmt"
-	"gt06_sim/internal/protocol"
+
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol"
 )
 
 func NewLoginPacket(imei string) (*LoginPacket, error) {

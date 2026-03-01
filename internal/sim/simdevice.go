@@ -2,10 +2,11 @@ package sim
 
 import (
 	"context"
-	"gt06_sim/internal/device"
-	"gt06_sim/internal/protocol/gt06"
-	"gt06_sim/internal/tcp"
 	"log/slog"
+
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/device"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/tcp"
 )
 
 type SimulatedDeviceState int

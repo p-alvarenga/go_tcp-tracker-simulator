@@ -1,8 +1,9 @@
 package sim
 
 import (
-	"gt06_sim/internal/protocol/gt06"
 	"time"
+
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
 )
 
 type SimulatedDeviceEventType int

@@ -1,11 +1,12 @@
 package sim
 
 import (
-	"gt06_sim/internal/device"
-	"gt06_sim/internal/protocol"
-	"gt06_sim/internal/tcp"
 	"log/slog"
 	"net"
+
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/device"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/tcp"
 )
 
 func (s *Simulator) createSimulatedDevices() error {

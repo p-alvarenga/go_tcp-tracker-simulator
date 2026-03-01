@@ -1,6 +1,6 @@
 package main
 
-import "gt06_sim/internal/sim"
+import "github.com/p-alvarenga/go_tcp-tracker-simulator/internal/sim"
 
 func main() {
 	simulator := sim.NewSimulator(sim.DefaultConfig())
