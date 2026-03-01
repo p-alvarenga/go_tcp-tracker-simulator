@@ -3,7 +3,7 @@ package gt06
 import "bytes"
 
 func ExtractFrame(buf []byte) ([]byte, []byte, bool) {
-	start := bytes.Index(buf, StartFlag)
+	start := bytes.Index(buf, startFlag[:])
 
 	if start == -1 {
 		switch len(buf) {
@@ -18,7 +18,7 @@ func ExtractFrame(buf []byte) ([]byte, []byte, bool) {
 		}
 	}
 
-	end := bytes.Index(buf[start+2:], StopFlag)
+	end := bytes.Index(buf[start+2:], stopFlag[:])
 	if end == -1 {
 		return nil, buf, false
 	}

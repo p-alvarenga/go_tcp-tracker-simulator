@@ -1,16 +1,16 @@
 package gt06
 
+type PacketType int
+
 var (
-	StartFlag []byte = []byte{0x78, 0x78}
-	StopFlag  []byte = []byte{0x0D, 0x0A}
+	startFlag = [2]byte{0x78, 0x78}
+	stopFlag  = [2]byte{0x0D, 0x0A}
 )
 
 const (
-	LoginFlag    byte = 0x01
-	LocationFlag byte = 0x12
+	loginFlag    byte = 0x01
+	locationFlag byte = 0x12
 )
-
-type PacketType int
 
 const (
 	LoginType PacketType = iota

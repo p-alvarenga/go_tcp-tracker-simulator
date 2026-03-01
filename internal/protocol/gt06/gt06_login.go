@@ -25,10 +25,10 @@ func (lp *LoginPacket) Type() PacketType {
 func (lp *LoginPacket) Build() ([]byte, error) {
 	var raw []byte
 
-	raw = append(raw, StartFlag...)
+	raw = append(raw, startFlag[:]...)
 	raw = append(raw, []byte{
 		0x0D,
-		LoginFlag,
+		loginFlag,
 	}...)
 
 	bcdImei, err := protocol.EncodeImeiToBcd(lp.Imei)
@@ -41,7 +41,7 @@ func (lp *LoginPacket) Build() ([]byte, error) {
 	raw = binary.BigEndian.AppendUint16(raw, lp.Serial)
 	raw = binary.BigEndian.AppendUint16(raw, protocol.CalculateCRC(raw[2:]))
 
-	raw = append(raw, StopFlag...)
+	raw = append(raw, stopFlag...)
 
 	return raw, nil
 }
