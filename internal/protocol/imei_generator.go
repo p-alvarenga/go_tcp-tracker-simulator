@@ -3,7 +3,7 @@ package protocol
 import (
 	"fmt"
 
-	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/device"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain/device"
 )
 
 type ImeiGenerator struct {

@@ -23,7 +23,7 @@ func (lp *LoginPacket) Type() PacketType {
 }
 
 func (lp *LoginPacket) Build() ([]byte, error) {
-	var raw []byte
+	raw := make([]byte, 0, 32)
 
 	raw = append(raw, startFlag[:]...)
 	raw = append(raw, []byte{
@@ -32,7 +32,7 @@ func (lp *LoginPacket) Build() ([]byte, error) {
 	}...)
 
 	bcdImei, err := protocol.EncodeImeiToBcd(lp.Imei)
-	if err != nil || len(bcdImei) != 15 {
+	if err != nil {
 		return nil, fmt.Errorf("gt06: Could not encode imei \"%s\" to bcd", lp.Imei)
 	}
 
@@ -41,7 +41,7 @@ func (lp *LoginPacket) Build() ([]byte, error) {
 	raw = binary.BigEndian.AppendUint16(raw, lp.Serial)
 	raw = binary.BigEndian.AppendUint16(raw, protocol.CalculateCRC(raw[2:]))
 
-	raw = append(raw, stopFlag...)
+	raw = append(raw, stopFlag[:]...)
 
 	return raw, nil
 }

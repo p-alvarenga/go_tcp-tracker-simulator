@@ -22,13 +22,13 @@ func ExtractAck(raw []byte) (*AckPacket, bool) {
 	}
 
 	switch protocolFlag {
-	case LoginFlag:
+	case loginFlag:
 		return &AckPacket{
 			PacketType:   LoginType,
 			SerialNumber: serialNumber,
 		}, true
 
-	case LocationFlag:
+	case locationFlag:
 		return &AckPacket{
 			PacketType:   LocationType,
 			SerialNumber: serialNumber,

@@ -6,7 +6,7 @@ func (c *Client) SendPacket(pkt gt06.Packet) error {
 	// validations
 	raw, err := pkt.Build()
 	if err != nil {
-		return err
+		c.logger.Error("Could not build packet")
 	}
 
 	c.sendCh <- raw

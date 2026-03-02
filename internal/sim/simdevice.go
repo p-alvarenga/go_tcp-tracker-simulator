@@ -4,36 +4,31 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/device"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/config"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain/device"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/tcp"
 )
 
-type SimulatedDeviceState int
-
-const (
-	StNew SimulatedDeviceState = iota
-	StLoggedIn
-)
-
-type simulatedDevice struct {
+type SimulatedDevice struct {
 	simulator *Simulator
-	cfg       *simulatedDeviceConfig
+	cfg       *config.SimulatedDeviceConfig
 
-	client *tcp.Client
-	device *device.Device
+	Client *tcp.Client
+	Device *device.Device
 
 	ctx    context.Context
 	cancel context.CancelFunc
 
 	logger *slog.Logger
 
-	state             SimulatedDeviceState
+	state             domain.SimulatedDeviceState
 	RetryLoginCounter int
 	lastPacket        gt06.Packet
 }
 
-func newSimulatedDevice(sim *Simulator, c *tcp.Client, d *device.Device, cfg *simulatedDeviceConfig) *simulatedDevice {
+func NewSimulatedDevice(sim *Simulator, c *tcp.Client, d *device.Device, cfg *config.SimulatedDeviceConfig) *SimulatedDevice {
 	ctx, cancel := context.WithCancel(sim.ctx)
 
 	logger := slog.Default().With(
@@ -41,19 +36,19 @@ func newSimulatedDevice(sim *Simulator, c *tcp.Client, d *device.Device, cfg *si
 		"imei", d.Imei,
 	)
 
-	return &simulatedDevice{
+	return &SimulatedDevice{
 		simulator:         sim,
 		cfg:               cfg,
-		client:            c,
-		device:            d,
+		Client:            c,
+		Device:            d,
 		ctx:               ctx,
 		cancel:            cancel,
 		logger:            logger,
-		state:             StNew,
+		state:             domain.StateNew,
 		RetryLoginCounter: 0,
 	}
 }
 
-func (sd *simulatedDevice) Shutdown() {
+func (sd *SimulatedDevice) Shutdown() {
 	sd.cancel()
 }

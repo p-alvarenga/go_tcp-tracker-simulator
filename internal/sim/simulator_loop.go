@@ -1,5 +1,9 @@
 package sim
 
+import (
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain"
+)
+
 func (s *Simulator) loop() {
 	for {
 		select {
@@ -11,23 +15,26 @@ func (s *Simulator) loop() {
 	}
 }
 
-func (s *Simulator) emit(ev *SimulatorEvent) {
+func (s *Simulator) emit(ev domain.SimulatorEvent) {
 	select {
-	case s.eventCh <- *ev:
+	case s.eventCh <- ev:
 	case <-s.ctx.Done():
 		return
 	}
 }
 
-func (s *Simulator) handleEvent(ev SimulatorEvent) {
-	sd := s.simulatedDevices[ev.DeviceId]
+func (s *Simulator) handleEvent(event domain.SimulatorEvent) {
+	sd := s.simulatedDevices[event.Id]
 	if sd == nil {
 		return
 	}
 
-	switch ev.Type {
-	case EvDeviceProtocolViolation, EvUnknown, EvDeviceUnexpectedResponse:
-		// sd.setState()
-		s.shutdownSimulatedDevice(ev.DeviceId)
+	switch event.Type {
+	case domain.EventProtocolViolation, // probably
+		domain.EventUnexpectedResponse,
+		domain.EventDisconnected,
+		domain.EventUnknown:
+
+		s.shutdownSimulatedDevice(event.Id)
 	}
 }

@@ -4,19 +4,16 @@ import (
 	"log/slog"
 	"net"
 
-	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/device"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain/device"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/tcp"
 )
 
 func (s *Simulator) createSimulatedDevices() error {
-	imeiGenerator := protocol.NewImeiGenerator(s.cfg.Device.ImeiTacBase, s.cfg.Device.ImeiSerialStart)
-	deviceConfig := &simulatedDeviceConfig{
-		TickInterval: s.cfg.TickInterval,
-
-		Lag:    s.cfg.Lag,
-		Device: s.cfg.Device,
-	}
+	imeiGenerator := protocol.NewImeiGenerator(
+		s.cfg.SimulatedDeviceConfig.Device.ImeiTacBase,
+		s.cfg.SimulatedDeviceConfig.Device.ImeiSerialStart,
+	)
 
 	for range s.cfg.MaxDevices {
 		imei := imeiGenerator.Next()
@@ -29,8 +26,8 @@ func (s *Simulator) createSimulatedDevices() error {
 		client := tcp.NewClient(conn)
 		device := device.NewDevice(imei)
 
-		sd := newSimulatedDevice(s, client, device, deviceConfig)
-		s.registerSimulatedDevice(sd)
+		sd := NewSimulatedDevice(s, client, device, &s.cfg.SimulatedDeviceConfig)
+		s.registerSd(sd)
 	}
 
 	return nil
@@ -38,7 +35,7 @@ func (s *Simulator) createSimulatedDevices() error {
 
 func (s *Simulator) startSimulatedDevices() {
 	for _, sd := range s.simulatedDevices {
-		go sd.run()
+		go sd.boot()
 	}
 }
 

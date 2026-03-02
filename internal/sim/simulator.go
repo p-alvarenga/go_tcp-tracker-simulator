@@ -4,43 +4,17 @@ import (
 	"context"
 	"log/slog"
 	"sync"
-	"time"
 
-	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/device"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/config"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain/device"
 )
-
-type SimulatorEventType int
-
-const (
-	EvDeviceCreated SimulatorEventType = iota
-	EvDeviceStarted
-	EvDeviceStopped
-	EvDeviceDisconnected
-	EvDeviceReconnected
-
-	EvDeviceLoginSucceeded
-	EvDeviceLocationSucceeded
-	EvDeviceLoginFailed
-	EvDeviceSessionExpired
-
-	EvDeviceProtocolViolation
-	EvDeviceInvalidStateTransition
-	EvDeviceUnexpectedResponse
-
-	EvUnknown
-)
-
-type SimulatorEvent struct {
-	DeviceId device.Imei
-	Type     SimulatorEventType
-	Time     time.Time
-}
 
 type Simulator struct {
-	cfg              SimulatorConfig
-	simulatedDevices map[device.Imei]*simulatedDevice
+	cfg              config.SimulatorConfig
+	simulatedDevices map[device.Imei]*SimulatedDevice
 
-	eventCh chan SimulatorEvent
+	eventCh chan domain.SimulatorEvent
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -51,18 +25,18 @@ type Simulator struct {
 	logger *slog.Logger
 }
 
-func NewSimulator(cfg *SimulatorConfig) *Simulator {
+func NewSimulator(config *config.SimulatorConfig) *Simulator {
 	return &Simulator{
-		cfg:              *cfg,
-		simulatedDevices: make(map[device.Imei]*simulatedDevice),
-		eventCh:          make(chan SimulatorEvent, 4096),
-		logger:           slog.With(slog.String("layer", "sim.Simulator")),
+		cfg:              *config,
+		simulatedDevices: make(map[device.Imei]*SimulatedDevice),
+		eventCh:          make(chan domain.SimulatorEvent, 4096),
+		logger:           slog.With(slog.String("layer", "Simulator")),
 	}
 }
 
-func (s *Simulator) registerSimulatedDevice(sd *simulatedDevice) {
+func (s *Simulator) registerSd(sd *SimulatedDevice) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.simulatedDevices[sd.device.Imei] = sd
+	s.simulatedDevices[sd.Device.Imei] = sd
 }

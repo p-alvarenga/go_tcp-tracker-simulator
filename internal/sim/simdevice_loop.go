@@ -1,22 +1,22 @@
 package sim
 
-import "time"
+import (
+	"time"
 
-func (sd *simulatedDevice) run() {
-	for {
-		select {
-		case <-sd.ctx.Done():
-			return
-		default:
-		}
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain"
+)
 
-		go sd.listenClient()
-		go sd.startSimulation()
-		go sd.loop()
-	}
+func (sd *SimulatedDevice) boot() {
+	go sd.listenClient()
+	go sd.loop()
+	go sd.Client.Start(sd.ctx)
+
+	sd.logger.Info("Simulated Device Initialized")
+
+	<-sd.ctx.Done()
 }
 
-func (sd *simulatedDevice) loop() {
+func (sd *SimulatedDevice) loop() {
 	ticker := time.NewTicker(sd.cfg.TickInterval)
 	defer ticker.Stop()
 
@@ -30,9 +30,14 @@ func (sd *simulatedDevice) loop() {
 	}
 }
 
-func (sd *simulatedDevice) step() {
+func (sd *SimulatedDevice) step() {
 	switch sd.state {
-	case StNew:
-		_ = sd.SendLogin()
+	case domain.StateNew:
+		err := sd.SendLogin()
+		if err != nil {
+			sd.logger.Error("Could not send login packet")
+		}
+
+	case domain.StateLoggedIn:
 	}
 }

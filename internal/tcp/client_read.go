@@ -7,7 +7,7 @@ import (
 )
 
 func (c *Client) readLoop() {
-	buf := make([]byte, 4*1024)
+	buf := make([]byte, 4096)
 
 	for {
 		select {
