@@ -50,8 +50,7 @@ func NewSimulatedDevice(sim *Simulator, client *tcp.Client, device *device.Devic
 }
 
 func (sd *SimulatedDevice) setState(st domain.SimulatedDeviceState) {
-	// DEAL WITH POSSIBLE RACE CONDITIONS
-	sd.state = st
+	sd.state = st // possible race condition
 }
 
 func (sd *SimulatedDevice) Shutdown() {
