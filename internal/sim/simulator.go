@@ -22,21 +22,36 @@ type Simulator struct {
 	wg sync.WaitGroup
 	mu sync.Mutex
 
-	logger *slog.Logger
+	rootLogger *slog.Logger
+	logger     *slog.Logger
 }
 
-func NewSimulator(config *config.SimulatorConfig) *Simulator {
+func NewSimulator(config *config.SimulatorConfig, rootLogger *slog.Logger) *Simulator {
 	return &Simulator{
 		cfg:              *config,
 		simulatedDevices: make(map[device.Imei]*SimulatedDevice),
 		eventCh:          make(chan domain.SimulatorEvent, 4096),
-		logger:           slog.With(slog.String("layer", "Simulator")),
+		logger:           rootLogger.With(slog.String("layer", "Simulator")),
+		rootLogger:       rootLogger,
 	}
 }
 
-func (s *Simulator) registerSd(sd *SimulatedDevice) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+func (s *Simulator) Boot() error {
+	s.ctx, s.cancel = context.WithCancel(context.Background())
 
-	s.simulatedDevices[sd.Device.Imei] = sd
+	s.logger.InfoContext(s.ctx, "Simulator booted")
+
+	err := s.createSimulatedDevices()
+	if err != nil {
+		s.logger.Error("Error in booting simulator", slog.Any("err", err))
+		return err
+	}
+
+	s.startSimulatedDevices()
+
+	go s.loop()
+
+	<-s.ctx.Done()
+
+	return nil
 }

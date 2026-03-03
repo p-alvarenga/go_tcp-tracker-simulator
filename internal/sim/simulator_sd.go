@@ -23,10 +23,10 @@ func (s *Simulator) createSimulatedDevices() error {
 			s.logger.Error("Could not connect into server", slog.String("addr", s.cfg.ServerAddr))
 		}
 
-		client := tcp.NewClient(conn)
-		device := device.NewDevice(imei)
+		client := tcp.NewClient(conn, s.rootLogger)
+		device := device.NewDevice(imei, s.cfg.SimulatedDeviceConfig.Device.ImeiSerialStart)
 
-		sd := NewSimulatedDevice(s, client, device, &s.cfg.SimulatedDeviceConfig)
+		sd := NewSimulatedDevice(s, client, device, s.rootLogger)
 		s.registerSd(sd)
 	}
 
@@ -49,4 +49,11 @@ func (s *Simulator) shutdownSimulatedDevice(sdId device.Imei) {
 
 	sd.Shutdown()
 	delete(s.simulatedDevices, sdId)
+}
+
+func (s *Simulator) registerSd(sd *SimulatedDevice) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.simulatedDevices[sd.Device.Imei] = sd
 }

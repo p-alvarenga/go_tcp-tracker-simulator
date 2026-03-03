@@ -16,11 +16,12 @@ func (s *Simulator) loop() {
 }
 
 func (s *Simulator) emit(ev domain.SimulatorEvent) {
-	select {
-	case s.eventCh <- ev:
-	case <-s.ctx.Done():
+	if !ev.Type.IsValid() {
+		s.logger.Warn("Invalid event type tried to emit", "event", ev)
 		return
 	}
+
+	s.eventCh <- ev
 }
 
 func (s *Simulator) handleEvent(event domain.SimulatorEvent) {
@@ -30,11 +31,14 @@ func (s *Simulator) handleEvent(event domain.SimulatorEvent) {
 	}
 
 	switch event.Type {
-	case domain.EventProtocolViolation, // probably
-		domain.EventUnexpectedResponse,
-		domain.EventDisconnected,
-		domain.EventUnknown:
+	case domain.EventLoginSucceeded:
+		sd.logger.Info("Device logged")
+		sd.setState(domain.StateLoggedIn) // race conditons?
 
+	case domain.EventProtocolViolation,
+		domain.EventUnexpectedResponse,
+		domain.EventInvalid: // probably
+		s.logger.Error("Shutting down device", "event", event.Type)
 		s.shutdownSimulatedDevice(event.Id)
 	}
 }

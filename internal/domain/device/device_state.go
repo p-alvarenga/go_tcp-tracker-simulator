@@ -8,7 +8,3 @@ type state struct {
 	Lat float64
 	Lng float64
 }
-
-func generateState() {
-	// ...
-}

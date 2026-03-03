@@ -28,25 +28,30 @@ type SimulatedDevice struct {
 	lastPacket        gt06.Packet
 }
 
-func NewSimulatedDevice(sim *Simulator, c *tcp.Client, d *device.Device, cfg *config.SimulatedDeviceConfig) *SimulatedDevice {
+func NewSimulatedDevice(sim *Simulator, client *tcp.Client, device *device.Device, rootLogger *slog.Logger) *SimulatedDevice {
 	ctx, cancel := context.WithCancel(sim.ctx)
 
-	logger := slog.Default().With(
-		"layer", "sim.simulatedDevice",
-		"imei", d.Imei,
+	logger := rootLogger.With(
+		"layer", "SimulatedDevice",
+		"imei", device.Imei,
 	)
 
 	return &SimulatedDevice{
 		simulator:         sim,
-		cfg:               cfg,
-		Client:            c,
-		Device:            d,
+		cfg:               &sim.cfg.SimulatedDeviceConfig,
+		Client:            client,
+		Device:            device,
 		ctx:               ctx,
 		cancel:            cancel,
 		logger:            logger,
 		state:             domain.StateNew,
 		RetryLoginCounter: 0,
 	}
+}
+
+func (sd *SimulatedDevice) setState(st domain.SimulatedDeviceState) {
+	// DEAL WITH POSSIBLE RACE CONDITIONS
+	sd.state = st
 }
 
 func (sd *SimulatedDevice) Shutdown() {

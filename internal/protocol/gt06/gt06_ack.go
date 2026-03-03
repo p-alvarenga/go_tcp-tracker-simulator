@@ -2,39 +2,41 @@ package gt06
 
 import (
 	"encoding/binary"
+	"fmt"
 
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol"
 )
 
-func ExtractAck(raw []byte) (*AckPacket, bool) {
-	length := int(raw[2])
-	if length != 5 || len(raw) != 10 {
-		return nil, false
+func ExtractAck(raw []byte) (*AckPacket, error) {
+	if len(raw) != 10 {
+		if int(raw[2]) != 5 {
+			return nil, fmt.Errorf("gt06: invalid packet length")
+		}
+
+		return nil, fmt.Errorf("gt06: invalid packet length")
 	}
 
-	protocolFlag := raw[3]
+	packetTypeFlag := raw[3]
 	serialNumber := binary.BigEndian.Uint16(raw[4:6])
-	crc := binary.BigEndian.Uint16(raw[6:8])
-	expectedCrc := protocol.CalculateCRC(raw[2:6])
 
-	if crc != expectedCrc {
-		return nil, false
+	if !protocol.ValidateCrc(raw) {
+		return nil, fmt.Errorf("gt06: invalid crc")
 	}
 
-	switch protocolFlag {
+	switch packetTypeFlag {
 	case loginFlag:
 		return &AckPacket{
 			PacketType:   LoginType,
 			SerialNumber: serialNumber,
-		}, true
+		}, nil
 
 	case locationFlag:
 		return &AckPacket{
 			PacketType:   LocationType,
 			SerialNumber: serialNumber,
-		}, true
+		}, nil
 
 	default:
-		return nil, false // not valid nor supported protocol type
+		return nil, nil // not valid nor supported protocol type
 	}
 }

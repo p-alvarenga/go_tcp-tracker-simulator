@@ -11,7 +11,7 @@ type Client struct {
 	conn net.Conn
 
 	sendCh chan []byte // buffered (32) - make(chan []byte, 32)
-	AckCh  chan []byte
+	ReadCh chan []byte
 
 	readBuf []byte
 
@@ -21,17 +21,13 @@ type Client struct {
 	wg sync.WaitGroup
 
 	logger *slog.Logger
-
-	OnHandleAck func([]byte)
 }
 
-func NewClient(conn net.Conn) *Client {
-	logger := slog.Default().With(slog.String("layer", "tcp.client"))
-
+func NewClient(conn net.Conn, rootLogger *slog.Logger) *Client { // created by Simulator
 	return &Client{
 		conn:   conn,
 		sendCh: make(chan []byte, 32),
-		AckCh:  make(chan []byte),
-		logger: logger,
+		ReadCh: make(chan []byte),
+		logger: rootLogger.With(slog.String("layer", "tcp.client")),
 	}
 }

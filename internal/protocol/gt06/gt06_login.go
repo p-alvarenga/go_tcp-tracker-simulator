@@ -39,7 +39,7 @@ func (lp *LoginPacket) Build() ([]byte, error) {
 	raw = append(raw, bcdImei...) // payload
 
 	raw = binary.BigEndian.AppendUint16(raw, lp.Serial)
-	raw = binary.BigEndian.AppendUint16(raw, protocol.CalculateCRC(raw[2:]))
+	raw = binary.BigEndian.AppendUint16(raw, protocol.CalculateCrc(raw[2:]))
 
 	raw = append(raw, stopFlag[:]...)
 

@@ -34,11 +34,10 @@ func (c *Client) processBuffer() {
 	var ok bool
 	for {
 		frame, c.readBuf, ok = gt06.ExtractFrame(c.readBuf)
-
 		if !ok {
 			return
 		}
 
-		c.AckCh <- frame
+		c.ReadCh <- frame
 	}
 }

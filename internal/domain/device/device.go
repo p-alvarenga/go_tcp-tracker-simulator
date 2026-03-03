@@ -6,7 +6,7 @@ type Imei string
 
 type Device struct {
 	Imei   Imei
-	Serial uint
+	Serial int
 
 	State *state
 
@@ -16,7 +16,7 @@ type Device struct {
 	logger *slog.Logger
 }
 
-func NewDevice(imei Imei) *Device {
+func NewDevice(imei Imei, serial int) *Device {
 	return &Device{
 		Imei:   imei,
 		Serial: 0,

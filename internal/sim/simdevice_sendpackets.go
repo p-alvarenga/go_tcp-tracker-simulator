@@ -9,12 +9,12 @@ func (sd *SimulatedDevice) SendLogin() error {
 		return err
 	}
 
-	sd.logger.Info("Sending Login Packet")
-
 	err = sd.Client.SendPacket(pkt)
 	if err != nil {
 		sd.logger.Error("Could not send packet", "err", err)
 	}
+
+	sd.lastPacket = pkt
 
 	return nil
 }

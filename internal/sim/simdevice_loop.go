@@ -7,11 +7,11 @@ import (
 )
 
 func (sd *SimulatedDevice) boot() {
-	go sd.listenClient()
+	sd.logger.With("state", sd.state)
+
+	go sd.readClient()
 	go sd.loop()
 	go sd.Client.Start(sd.ctx)
-
-	sd.logger.Info("Simulated Device Initialized")
 
 	<-sd.ctx.Done()
 }
@@ -29,7 +29,6 @@ func (sd *SimulatedDevice) loop() {
 		}
 	}
 }
-
 func (sd *SimulatedDevice) step() {
 	switch sd.state {
 	case domain.StateNew:
@@ -37,7 +36,9 @@ func (sd *SimulatedDevice) step() {
 		if err != nil {
 			sd.logger.Error("Could not send login packet")
 		}
+		// sd.logger.Info("Sending login packet")
 
 	case domain.StateLoggedIn:
+		sd.logger.Info("Logged in")
 	}
 }
