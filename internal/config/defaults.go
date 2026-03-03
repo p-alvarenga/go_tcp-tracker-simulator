@@ -8,9 +8,8 @@ import (
 
 func DefaultConfig() *SimulatorConfig {
 	return &SimulatorConfig{
-		ServerAddr:  "localhost:9000",
-		DialTimeout: 5 * time.Second,
-		MaxDevices:  1,
+		ServerAddr: "localhost:9000",
+		MaxDevices: 1,
 
 		AutoStart:               true,
 		GracefulShutdownTimeout: 10 * time.Second,
@@ -18,8 +17,9 @@ func DefaultConfig() *SimulatorConfig {
 		SimulatedDeviceConfig: SimulatedDeviceConfig{
 			TickInterval: 1 * time.Second,
 
-			Lag:    defaultLagConfig(),
-			Device: defaultDeviceConfig(),
+			Connection: defaultConnectionConfig(),
+			Lag:        defaultLagConfig(),
+			Device:     defaultDeviceConfig(),
 		},
 	}
 }
@@ -42,12 +42,6 @@ func defaultDeviceConfig() *deviceConfig {
 		ImeiTacBase:     "12345678",
 		ImeiSerialStart: 1,
 
-		LoginRetry: loginConfig{
-			MaxRetries: 5,
-			BackoffMin: 1 * time.Second,
-			BackoffMax: 5 * time.Second,
-		},
-
 		Location: locationConfig{
 			Enabled: true,
 
@@ -57,5 +51,19 @@ func defaultDeviceConfig() *deviceConfig {
 			MaxUpdateInterval: 3 * time.Second,
 			MinUpdateInterval: 9 * time.Second,
 		},
+	}
+}
+
+func defaultConnectionConfig() *ConnectionConfig {
+	return &ConnectionConfig{
+		// Connection
+		DialTimeout: 5 * time.Second,
+
+		// Reconnect
+		TryReconnect:      true,
+		MaxRetries:        0, // infinite
+		BackoffMin:        1 * time.Second,
+		BackoffMax:        120 * time.Second,
+		BackoffMultiplier: 2.0, // 1s -> 2s -> 4s -> 8s -> 16s -> ...
 	}
 }

@@ -7,9 +7,8 @@ import (
 )
 
 type SimulatorConfig struct {
-	ServerAddr  string
-	DialTimeout time.Duration
-	MaxDevices  int
+	ServerAddr string
+	MaxDevices int
 
 	AutoStart               bool
 	GracefulShutdownTimeout time.Duration
@@ -33,14 +32,7 @@ type deviceConfig struct {
 	ImeiSerialStart int
 
 	InitialState domain.SimulatedDeviceState
-	LoginRetry   loginConfig
 	Location     locationConfig
-}
-
-type loginConfig struct {
-	MaxRetries int
-	BackoffMin time.Duration
-	BackoffMax time.Duration
 }
 
 type locationConfig struct {

@@ -12,11 +12,15 @@ type SimulatedDeviceState int
 const (
 	StateNew SimulatedDeviceState = iota
 	StateLoggedIn
+	StateDisconnected
+	StateReconnecting
 )
 
 var simDeviceStateNames = map[SimulatedDeviceState]string{
-	StateNew:      "STATE_NEW",
-	StateLoggedIn: "STATE_LOGGED_IN",
+	StateNew:          "STATE_NEW",
+	StateLoggedIn:     "STATE_LOGGED_IN",
+	StateDisconnected: "STATE_DISCONNECTED",
+	StateReconnecting: "STATE_RECONNECTING",
 }
 
 func (s SimulatedDeviceState) String() string {
@@ -44,6 +48,7 @@ const (
 	EventConnected
 	EventDisconnected
 	EventReconnected
+	EventStartReconnection
 
 	EventLoginSucceeded
 	EventLoginFailed
@@ -65,6 +70,7 @@ var simulatorEventTypeNames = map[SimulatorEventType]string{
 	EventConnected:              "EVENT_CONNECTED",
 	EventDisconnected:           "EVENT_DISCONNECTED",
 	EventReconnected:            "EVENT_RECONNECTED",
+	EventStartReconnection:      "EVENT_START_RECONNECTION",
 	EventLoginSucceeded:         "EVENT_LOGIN_SUCCEEDED",
 	EventLoginFailed:            "EVENT_LOGIN_FAILED",
 	EventLocationSucceeded:      "EVENT_LOCATION_SUCCEEDED",

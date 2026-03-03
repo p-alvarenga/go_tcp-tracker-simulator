@@ -3,6 +3,7 @@ package sim
 import (
 	"context"
 	"log/slog"
+	"sync"
 
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/config"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain"
@@ -20,12 +21,12 @@ type SimulatedDevice struct {
 
 	ctx    context.Context
 	cancel context.CancelFunc
+	mu     sync.Mutex
 
 	logger *slog.Logger
 
-	state             domain.SimulatedDeviceState
-	RetryLoginCounter int
-	lastPacket        gt06.Packet
+	state      domain.SimulatedDeviceState
+	lastPacket gt06.Packet
 }
 
 func NewSimulatedDevice(sim *Simulator, client *tcp.Client, device *device.Device, rootLogger *slog.Logger) *SimulatedDevice {
@@ -37,20 +38,27 @@ func NewSimulatedDevice(sim *Simulator, client *tcp.Client, device *device.Devic
 	)
 
 	return &SimulatedDevice{
-		simulator:         sim,
-		cfg:               &sim.cfg.SimulatedDeviceConfig,
-		Client:            client,
-		Device:            device,
-		ctx:               ctx,
-		cancel:            cancel,
-		logger:            logger,
-		state:             domain.StateNew,
-		RetryLoginCounter: 0,
+		simulator: sim,
+		cfg:       &sim.cfg.SimulatedDeviceConfig,
+		Client:    client,
+		Device:    device,
+		ctx:       ctx,
+		cancel:    cancel,
+		logger:    logger,
+		state:     domain.StateNew,
 	}
 }
 
-func (sd *SimulatedDevice) setState(st domain.SimulatedDeviceState) {
-	sd.state = st // possible race condition
+func (sd *SimulatedDevice) setState(state domain.SimulatedDeviceState) {
+	sd.mu.Lock()
+	sd.state = state
+	sd.mu.Unlock()
+}
+
+func (sd *SimulatedDevice) getState() domain.SimulatedDeviceState {
+	sd.mu.Lock()
+	defer sd.mu.Unlock()
+	return sd.state
 }
 
 func (sd *SimulatedDevice) Shutdown() {

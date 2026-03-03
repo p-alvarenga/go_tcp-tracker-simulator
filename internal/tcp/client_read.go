@@ -18,8 +18,7 @@ func (c *Client) readLoop() {
 
 		n, err := c.conn.Read(buf)
 		if err != nil {
-			c.logger.Warn("Could not read", slog.Any("err", err))
-
+			c.logger.Error("Could not read", slog.Any("err", err))
 			c.cancel()
 			return
 		}

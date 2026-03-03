@@ -31,9 +31,20 @@ func (s *Simulator) handleEvent(event domain.SimulatorEvent) {
 	}
 
 	switch event.Type {
+	case domain.EventReconnected:
+		sd.setState(domain.StateNew)
+
 	case domain.EventLoginSucceeded:
 		sd.logger.Info("Device logged")
 		sd.setState(domain.StateLoggedIn) // race conditons?
+
+	case domain.EventDisconnected:
+		s.logger.Warn("Client disconnected", "id", sd.Device.Imei)
+		sd.setState(domain.StateDisconnected)
+
+	case domain.EventStartReconnection:
+		s.logger.Warn("Device Client started reconnection")
+		sd.setState(domain.StateReconnecting)
 
 	case domain.EventProtocolViolation,
 		domain.EventUnexpectedResponse,

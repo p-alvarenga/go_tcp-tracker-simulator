@@ -2,7 +2,6 @@ package sim
 
 import (
 	"log/slog"
-	"net"
 
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain/device"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol"
@@ -18,16 +17,21 @@ func (s *Simulator) createSimulatedDevices() error {
 	for range s.cfg.MaxDevices {
 		imei := imeiGenerator.Next()
 
-		conn, err := net.DialTimeout("tcp", s.cfg.ServerAddr, s.cfg.DialTimeout)
+		client, err := tcp.NewClient(
+			s.cfg.ServerAddr,
+			s.cfg.SimulatedDeviceConfig.TickInterval,
+			s.rootLogger,
+		)
+
 		if err != nil {
 			s.logger.Error("Could not connect into server", slog.String("addr", s.cfg.ServerAddr))
+			return err
 		}
 
-		client := tcp.NewClient(conn, s.rootLogger)
 		device := device.NewDevice(imei, s.cfg.SimulatedDeviceConfig.Device.ImeiSerialStart)
-
 		sd := NewSimulatedDevice(s, client, device, s.rootLogger)
-		s.registerSd(sd)
+
+		s.registerSimulatedDevice(sd)
 	}
 
 	return nil
@@ -51,7 +55,7 @@ func (s *Simulator) shutdownSimulatedDevice(sdId device.Imei) {
 	delete(s.simulatedDevices, sdId)
 }
 
-func (s *Simulator) registerSd(sd *SimulatedDevice) {
+func (s *Simulator) registerSimulatedDevice(sd *SimulatedDevice) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

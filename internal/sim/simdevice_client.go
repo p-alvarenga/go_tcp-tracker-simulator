@@ -7,7 +7,7 @@ import (
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
 )
 
-func (sd *SimulatedDevice) readClient() {
+func (sd *SimulatedDevice) ReadClient() {
 	for {
 		select {
 		case <-sd.ctx.Done():
@@ -15,16 +15,43 @@ func (sd *SimulatedDevice) readClient() {
 
 		case ack, ok := <-sd.Client.ReadCh:
 			if !ok {
-				sd.logger.Warn("Client read channel was closed. shutting simulated device down")
-
+				sd.logger.Warn("Client read channel was closed")
 				sd.emit(domain.EventDisconnected)
+
 				return
 			}
 
 			ev := sd.translateAck(ack)
-			// sd.logger.Info("Ack Event", "event", ev)
-
 			sd.emit(ev)
+		}
+	}
+}
+
+func (sd *SimulatedDevice) MonitorClient() {
+	for {
+		select {
+		case <-sd.ctx.Done():
+			return
+		case <-sd.Client.Done():
+			if sd.getState() != domain.StateReconnecting {
+				sd.emit(domain.EventStartReconnection) // change state to reconnecting
+			} else {
+				continue
+			}
+
+			// Reconnect loop
+			if sd.cfg.Connection.TryReconnect {
+				err := sd.reconnectLoop()
+				if err != nil {
+					sd.logger.Error("Could not reconnect", "err", err)
+					sd.cancel()
+				}
+
+				sd.emit(domain.EventReconnected)
+			} else {
+				sd.logger.Warn("Config is set to not try reconnect. Shutting down device")
+				sd.cancel()
+			}
 		}
 	}
 }

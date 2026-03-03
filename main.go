@@ -16,10 +16,7 @@ func main() {
 
 	simulator := sim.NewSimulator(config.DefaultConfig(), logger)
 
-	err := simulator.Boot()
-	if err != nil {
-		panic("Server could not boot")
-	}
+	_ = simulator.Boot()
 }
 
 func buildLogger() *slog.Logger {

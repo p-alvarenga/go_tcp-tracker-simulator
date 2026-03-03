@@ -5,13 +5,17 @@ import (
 	"log/slog"
 	"net"
 	"sync"
+	"time"
 )
 
 type Client struct {
-	conn net.Conn
+	conn        net.Conn
+	addr        string
+	connTimeout time.Duration
 
 	sendCh chan []byte // buffered (32) - make(chan []byte, 32)
 	ReadCh chan []byte
+	done   chan struct{}
 
 	readBuf []byte
 
@@ -23,11 +27,43 @@ type Client struct {
 	logger *slog.Logger
 }
 
-func NewClient(conn net.Conn, rootLogger *slog.Logger) *Client { // created by Simulator
+func NewClient(addr string, timeout time.Duration, rootLogger *slog.Logger) (*Client, error) {
+	conn, err := net.DialTimeout("tcp", addr, timeout)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Client{
-		conn:   conn,
+		conn:        conn,
+		addr:        addr,
+		connTimeout: timeout,
+
 		sendCh: make(chan []byte, 32),
 		ReadCh: make(chan []byte),
-		logger: rootLogger.With(slog.String("layer", "tcp.client")),
-	}
+		done:   make(chan struct{}),
+
+		logger: rootLogger.With(slog.String("layer", "Client")),
+	}, nil
+}
+
+func (c *Client) Start(parentCtx context.Context) {
+	c.ctx, c.cancel = context.WithCancel(parentCtx)
+
+	go c.readLoop()
+	go c.writeLoop()
+
+	<-c.ctx.Done() // wait until c.cancel()
+
+	c.conn.Close()
+	close(c.done)
+}
+
+func (c *Client) TryConnect() error {
+	var err error
+	c.conn, err = net.DialTimeout("tcp", c.addr, c.connTimeout)
+	return err
+}
+
+func (c *Client) Done() <-chan struct{} {
+	return c.done
 }
