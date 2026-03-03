@@ -39,11 +39,13 @@ func (sd *SimulatedDevice) loop() {
 
 func (sd *SimulatedDevice) step(state domain.SimulatedDeviceState) {
 	switch state {
-	case domain.StateNew:
+	case domain.StateConnected:
 		err := sd.SendLogin()
 		if err != nil {
 			sd.logger.Error("Could not send login packet")
 		}
+
+		sd.logger.Info("Sending login")
 
 	case domain.StateLoggedIn:
 		sd.logger.Info("Logged in")

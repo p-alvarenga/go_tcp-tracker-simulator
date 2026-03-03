@@ -10,14 +10,16 @@ import (
 type SimulatedDeviceState int
 
 const (
-	StateNew SimulatedDeviceState = iota
+	StateCreated SimulatedDeviceState = iota
+	StateConnected
 	StateLoggedIn
 	StateDisconnected
 	StateReconnecting
 )
 
 var simDeviceStateNames = map[SimulatedDeviceState]string{
-	StateNew:          "STATE_NEW",
+	StateCreated:      "STATE_CREATED",
+	StateConnected:    "STATE_CONNECTED",
 	StateLoggedIn:     "STATE_LOGGED_IN",
 	StateDisconnected: "STATE_DISCONNECTED",
 	StateReconnecting: "STATE_RECONNECTING",

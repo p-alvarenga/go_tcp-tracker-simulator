@@ -46,7 +46,7 @@ func NewSimulatedDevice(sim *Simulator, client *tcp.Client, device *device.Devic
 		ctx:       ctx,
 		cancel:    cancel,
 		logger:    logger,
-		state:     domain.StateNew,
+		state:     domain.StateCreated,
 	}
 }
 

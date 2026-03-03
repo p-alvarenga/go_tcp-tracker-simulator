@@ -32,7 +32,7 @@ func (s *Simulator) handleEvent(event domain.SimulatorEvent) {
 
 	switch event.Type {
 	case domain.EventReconnected:
-		sd.setState(domain.StateNew)
+		sd.setState(domain.StateConnected)
 
 	case domain.EventLoginSucceeded:
 		sd.logger.Info("Device logged")

@@ -37,7 +37,7 @@ func defaultLagConfig() *lagConfig {
 
 func defaultDeviceConfig() *deviceConfig {
 	return &deviceConfig{
-		InitialState: domain.StateNew,
+		InitialState: domain.StateCreated,
 
 		ImeiTacBase:     "12345678",
 		ImeiSerialStart: 1,
