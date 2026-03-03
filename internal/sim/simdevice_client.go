@@ -33,28 +33,34 @@ func (sd *SimulatedDevice) MonitorClient() {
 		case <-sd.ctx.Done():
 			return
 		case <-sd.Client.Done():
-			if sd.getState() != domain.StateReconnecting {
-				sd.emit(domain.EventStartReconnection) // change state to reconnecting
-			} else {
-				continue
-			}
+			st := sd.getState()
 
-			// Reconnect loop
-			if sd.cfg.Connection.TryReconnect {
+			if st != domain.StateReconnecting {
+				sd.emit(domain.EventStartReconnection)
+
 				err := sd.reconnectLoop()
 				if err != nil {
 					sd.logger.Error("Could not reconnect", "err", err)
-					sd.cancel()
+				} else {
+					sd.emit(domain.EventReconnected)
 				}
-
-				sd.emit(domain.EventReconnected)
-			} else {
-				sd.logger.Warn("Config is set to not try reconnect. Shutting down device")
-				sd.cancel()
 			}
 		}
 	}
 }
+
+// case <-sd.Client.Done(): // raw version
+// 	sd.mu.Lock()
+// 	if sd.state != domain.StateReconnecting {
+// 		sd.state = domain.StateReconnecting
+// 		err := sd.reconnectLoop()
+// 		if err != nil {
+// 			sd.logger.Error("Could not reconnect", "err", err)
+// 		}
+// 	} else {
+// 		sd.mu.Unlock()
+// 	}
+// }
 
 func (sd *SimulatedDevice) translateAck(raw []byte) domain.SimulatorEventType {
 	ack, err := gt06.ExtractAck(raw)

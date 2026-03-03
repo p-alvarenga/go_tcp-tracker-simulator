@@ -9,7 +9,7 @@ import (
 func DefaultConfig() *SimulatorConfig {
 	return &SimulatorConfig{
 		ServerAddr: "localhost:9000",
-		MaxDevices: 1,
+		MaxDevices: 2,
 
 		AutoStart:               true,
 		GracefulShutdownTimeout: 10 * time.Second,

@@ -36,14 +36,11 @@ func (s *Simulator) handleEvent(event domain.SimulatorEvent) {
 
 	case domain.EventLoginSucceeded:
 		sd.logger.Info("Device logged")
-		sd.setState(domain.StateLoggedIn) // race conditons?
+		sd.setState(domain.StateLoggedIn)
 
-	case domain.EventDisconnected:
-		s.logger.Warn("Client disconnected", "id", sd.Device.Imei)
-		sd.setState(domain.StateDisconnected)
-
-	case domain.EventStartReconnection:
-		s.logger.Warn("Device Client started reconnection")
+	case domain.EventDisconnected,
+		domain.EventStartReconnection:
+		s.logger.Warn("Device Client started reconnection", "state", sd.state)
 		sd.setState(domain.StateReconnecting)
 
 	case domain.EventProtocolViolation,

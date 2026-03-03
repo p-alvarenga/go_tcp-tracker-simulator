@@ -47,7 +47,9 @@ func (s *Simulator) Boot() error {
 		return err
 	}
 
-	s.startSimulatedDevices()
+	for _, sd := range s.simulatedDevices {
+		go sd.boot()
+	}
 
 	go s.loop()
 

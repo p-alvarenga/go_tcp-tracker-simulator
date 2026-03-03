@@ -19,9 +19,10 @@ type SimulatedDevice struct {
 	Client *tcp.Client
 	Device *device.Device
 
-	ctx    context.Context
-	cancel context.CancelFunc
-	mu     sync.Mutex
+	reconnecting bool
+	ctx          context.Context
+	cancel       context.CancelFunc
+	mu           sync.Mutex
 
 	logger *slog.Logger
 
