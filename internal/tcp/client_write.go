@@ -10,6 +10,13 @@ func (c *Client) writeLoop() {
 
 		raw := <-c.sendCh // wait until sendCh
 
-		c.conn.Write(raw) // configuration
+		n, err := c.conn.Write(raw) // configuration
+		if err != nil {
+			c.logger.Error("Connection returned error", "err", err)
+		}
+
+		if n != len(raw) {
+			c.logger.Warn("Could not send all raw packet")
+		}
 	}
 }
