@@ -7,7 +7,9 @@ import (
 )
 
 type SimulatorConfig struct {
-	ServerAddr string
+	ServerHost string
+	ServerPort int
+
 	MaxDevices int
 
 	AutoStart               bool

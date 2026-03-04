@@ -8,7 +8,8 @@ import (
 
 func DefaultConfig() *SimulatorConfig {
 	return &SimulatorConfig{
-		ServerAddr: "localhost:9000",
+		ServerHost: "0.0.0.0",
+		ServerPort: 9000,
 		MaxDevices: 2,
 
 		AutoStart:               true,

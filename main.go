@@ -11,11 +11,12 @@ import (
 )
 
 func main() {
-	//logger := slog.Default()
 	logger := buildLogger()
 
-	simulator := sim.NewSimulator(config.DefaultConfig(), logger)
+	cfg := config.DefaultConfig()
+	config.ParseFlags(cfg)
 
+	simulator := sim.NewSimulator(cfg, logger)
 	_ = simulator.Boot()
 }
 

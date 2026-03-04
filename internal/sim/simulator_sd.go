@@ -2,6 +2,8 @@ package sim
 
 import (
 	"log/slog"
+	"net"
+	"strconv"
 
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain/device"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol"
@@ -14,17 +16,19 @@ func (s *Simulator) createSimulatedDevices() error {
 		s.cfg.SimulatedDeviceConfig.Device.ImeiSerialStart,
 	)
 
+	addr := net.JoinHostPort(s.cfg.ServerHost, strconv.Itoa(s.cfg.ServerPort))
+
 	for range s.cfg.MaxDevices {
 		imei := imeiGenerator.Next()
 
 		client, err := tcp.NewClient(
-			s.cfg.ServerAddr,
+			addr,
 			s.cfg.SimulatedDeviceConfig.TickInterval,
 			s.rootLogger,
 		)
 
 		if err != nil {
-			s.logger.Error("Could not connect into server", slog.String("addr", s.cfg.ServerAddr))
+			s.logger.Error("Could not connect into server", slog.String("addr", addr))
 			return err
 		}
 
