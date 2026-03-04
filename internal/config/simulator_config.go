@@ -8,7 +8,7 @@ import (
 
 type SimulatorConfig struct {
 	ServerHost string
-	ServerPort string
+	ServerPort int
 
 	MaxDevices int
 
