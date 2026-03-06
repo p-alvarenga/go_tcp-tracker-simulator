@@ -1,13 +1,13 @@
 package device
 
-type gpsInfo struct {
+type gps struct {
 	QuantityOfGpsInfo uint8
 	RealTime          bool
 	Trusful           bool
 }
 
-func newGpsInfo(quantityOfGpsInfo uint8, realtime, trustful bool) *gpsInfo {
-	return &gpsInfo{
+func newGPS(quantityOfGpsInfo uint8, realtime, trustful bool) *gps {
+	return &gps{
 		QuantityOfGpsInfo: quantityOfGpsInfo,
 		RealTime:          realtime,
 		Trusful:           trustful,

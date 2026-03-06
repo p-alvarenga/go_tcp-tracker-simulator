@@ -2,23 +2,23 @@ package device
 
 import "log/slog"
 
-type Imei string
+type IMEI string
 
 type Device struct {
-	Imei   Imei
+	IMEI   IMEI
 	Serial int
 
-	State *state
+	State *DeviceState
 
-	Gps *gpsInfo
-	Lbs *lbsInfo
+	GPS *gps
+	LBS *lbs
 
 	logger *slog.Logger
 }
 
-func NewDevice(imei Imei, serial int) *Device {
+func NewDevice(imei IMEI, serial int) *Device {
 	return &Device{
-		Imei:   imei,
+		IMEI:   imei,
 		Serial: 0,
 	}
 }

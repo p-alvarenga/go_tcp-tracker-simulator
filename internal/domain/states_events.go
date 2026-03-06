@@ -37,8 +37,6 @@ func (s SimulatedDeviceState) IsValid() bool {
 	return s >= 0 && int(s) < len(simDeviceStateNames)
 }
 
-// SIMULATOR EVENT TYPE
-
 type SimulatorEventType int
 
 const (
@@ -96,7 +94,7 @@ func (s SimulatorEventType) IsValid() bool {
 }
 
 type SimulatorEvent struct {
-	Id   device.Imei
+	ID   device.IMEI
 	Type SimulatorEventType
 	Time time.Time
 }

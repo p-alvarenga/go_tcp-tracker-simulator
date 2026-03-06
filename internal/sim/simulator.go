@@ -12,7 +12,7 @@ import (
 
 type Simulator struct {
 	cfg              config.SimulatorConfig
-	simulatedDevices map[device.Imei]*SimulatedDevice
+	simulatedDevices map[device.IMEI]*SimulatedDevice
 
 	eventCh chan domain.SimulatorEvent
 
@@ -29,7 +29,7 @@ type Simulator struct {
 func NewSimulator(config *config.SimulatorConfig, rootLogger *slog.Logger) *Simulator {
 	return &Simulator{
 		cfg:              *config,
-		simulatedDevices: make(map[device.Imei]*SimulatedDevice),
+		simulatedDevices: make(map[device.IMEI]*SimulatedDevice),
 		eventCh:          make(chan domain.SimulatorEvent, 4096),
 		logger:           rootLogger.With(slog.String("layer", "Simulator")),
 		rootLogger:       rootLogger,
@@ -47,12 +47,9 @@ func (s *Simulator) Boot() error {
 		return err
 	}
 
-	for _, sd := range s.simulatedDevices {
-		go sd.boot()
-	}
+	s.startSimulatedDevices()
 
 	go s.loop()
-
 	<-s.ctx.Done()
 
 	return nil

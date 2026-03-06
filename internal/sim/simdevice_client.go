@@ -7,32 +7,32 @@ import (
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
 )
 
-func (sd *SimulatedDevice) ReadClient() {
+func (sd *SimulatedDevice) ReadSession() {
 	for {
 		select {
 		case <-sd.ctx.Done():
 			return
 
-		case ack, ok := <-sd.Client.ReadCh:
+		case ack, ok := <-sd.Session.ReadCh:
 			if !ok {
-				sd.logger.Warn("Client read channel was closed")
+				sd.logger.Warn("Session read channel was closed")
 				sd.emit(domain.EventDisconnected)
 
 				return
 			}
 
-			ev := sd.translateAck(ack)
+			ev := sd.translateACK(ack)
 			sd.emit(ev)
 		}
 	}
 }
 
-func (sd *SimulatedDevice) MonitorClient() {
+func (sd *SimulatedDevice) MonitorSession() {
 	for {
 		select {
 		case <-sd.ctx.Done():
 			return
-		case <-sd.Client.Done():
+		case <-sd.Session.Done():
 			st := sd.getState()
 
 			if st != domain.StateReconnecting && st != domain.StateConnected {
@@ -50,8 +50,8 @@ func (sd *SimulatedDevice) MonitorClient() {
 	}
 }
 
-func (sd *SimulatedDevice) translateAck(raw []byte) domain.SimulatorEventType {
-	ack, err := gt06.ExtractAck(raw)
+func (sd *SimulatedDevice) translateACK(frame []byte) domain.SimulatorEventType {
+	ack, err := gt06.DecodeACK(frame)
 
 	if err != nil || ack == nil {
 		sd.logger.Error("Protocol Violation", "err", err)
@@ -62,15 +62,15 @@ func (sd *SimulatedDevice) translateAck(raw []byte) domain.SimulatorEventType {
 		return domain.EventUnexpectedResponse
 	}
 
-	if !sd.lastPacket.ReceiveAck(ack) {
+	if !gt06.CheckACK(sd.lastPacket, ack) {
 		return domain.EventUnexpectedResponse
 	}
 
-	switch sd.lastPacket.(type) {
-	case *gt06.LoginPacket:
+	switch sd.lastPacket.Type() {
+	case gt06.LoginType:
 		return domain.EventLoginSucceeded
 
-	case *gt06.LocationPacket:
+	case gt06.LocationType:
 		return domain.EventLocationSucceeded
 	}
 
@@ -79,7 +79,7 @@ func (sd *SimulatedDevice) translateAck(raw []byte) domain.SimulatorEventType {
 
 func (sd *SimulatedDevice) emit(eventType domain.SimulatorEventType) {
 	sd.simulator.emit(domain.SimulatorEvent{
-		Id:   sd.Device.Imei,
+		ID:   sd.Device.IMEI,
 		Type: eventType,
 		Time: time.Now(),
 	})

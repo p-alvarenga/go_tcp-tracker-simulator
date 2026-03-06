@@ -9,15 +9,15 @@ import (
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain/device"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
-	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/tcp"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/session"
 )
 
 type SimulatedDevice struct {
 	simulator *Simulator
 	cfg       *config.SimulatedDeviceConfig
 
-	Client *tcp.Client
-	Device *device.Device
+	Session *session.Session
+	Device  *device.Device
 
 	reconnecting bool
 	ctx          context.Context
@@ -30,19 +30,19 @@ type SimulatedDevice struct {
 	lastPacket gt06.Packet
 }
 
-func NewSimulatedDevice(sim *Simulator, client *tcp.Client, device *device.Device, rootLogger *slog.Logger) *SimulatedDevice {
+func NewSimulatedDevice(sim *Simulator, s *session.Session, d *device.Device, rootLogger *slog.Logger) *SimulatedDevice {
 	ctx, cancel := context.WithCancel(sim.ctx)
 
 	logger := rootLogger.With(
 		"layer", "SimulatedDevice",
-		"imei", device.Imei,
+		"imei", d.IMEI,
 	)
 
 	return &SimulatedDevice{
 		simulator: sim,
 		cfg:       &sim.cfg.SimulatedDeviceConfig,
-		Client:    client,
-		Device:    device,
+		Session:   s,
+		Device:    d,
 		ctx:       ctx,
 		cancel:    cancel,
 		logger:    logger,

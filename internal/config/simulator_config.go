@@ -30,8 +30,8 @@ type lagConfig struct {
 }
 
 type deviceConfig struct {
-	ImeiTacBase     string
-	ImeiSerialStart int
+	IMEITacBase     string
+	IMEISerialStart int
 
 	InitialState domain.SimulatedDeviceState
 	Location     locationConfig

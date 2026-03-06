@@ -7,13 +7,13 @@ import (
 
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain/device"
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol"
-	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/tcp"
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/session"
 )
 
 func (s *Simulator) createSimulatedDevices() error {
-	imeiGenerator := protocol.NewImeiGenerator(
-		s.cfg.SimulatedDeviceConfig.Device.ImeiTacBase,
-		s.cfg.SimulatedDeviceConfig.Device.ImeiSerialStart,
+	imeiGenerator := protocol.NewIMEIGenerator(
+		s.cfg.SimulatedDeviceConfig.Device.IMEITacBase,
+		s.cfg.SimulatedDeviceConfig.Device.IMEISerialStart,
 	)
 
 	addr := net.JoinHostPort(s.cfg.ServerHost, strconv.Itoa(s.cfg.ServerPort))
@@ -21,7 +21,7 @@ func (s *Simulator) createSimulatedDevices() error {
 	for range s.cfg.MaxDevices {
 		imei := imeiGenerator.Next()
 
-		client, err := tcp.NewClient(
+		session, err := session.New(
 			addr,
 			s.cfg.SimulatedDeviceConfig.TickInterval,
 			s.rootLogger,
@@ -32,8 +32,8 @@ func (s *Simulator) createSimulatedDevices() error {
 			return err
 		}
 
-		device := device.NewDevice(imei, s.cfg.SimulatedDeviceConfig.Device.ImeiSerialStart)
-		sd := NewSimulatedDevice(s, client, device, s.rootLogger)
+		device := device.NewDevice(imei, s.cfg.SimulatedDeviceConfig.Device.IMEISerialStart)
+		sd := NewSimulatedDevice(s, session, device, s.rootLogger)
 
 		s.registerSimulatedDevice(sd)
 	}
@@ -47,21 +47,22 @@ func (s *Simulator) startSimulatedDevices() {
 	}
 }
 
-func (s *Simulator) shutdownSimulatedDevice(sdId device.Imei) {
-	sd := s.simulatedDevices[sdId]
-	if sd == nil {
-		return
-	}
+func (s *Simulator) shutdownSimulatedDevice(id device.IMEI) { // Double check for race
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	sd := s.simulatedDevices[id]
+	if sd == nil {
+		return
+	}
+
 	sd.Shutdown()
-	delete(s.simulatedDevices, sdId)
+	delete(s.simulatedDevices, id)
 }
 
 func (s *Simulator) registerSimulatedDevice(sd *SimulatedDevice) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.simulatedDevices[sd.Device.Imei] = sd
+	s.simulatedDevices[sd.Device.IMEI] = sd
 }

@@ -1,8 +1,8 @@
 package device
 
-type lbsInfo struct {
-	Mcc    uint16 // Mobile Country Code
-	Mnc    uint8  // Mobile Network Code
-	Lac    uint16 // Location Area Code
-	CellId uint32
+type lbs struct {
+	MCC    uint16 // Mobile Country Code
+	MNC    uint8  // Mobile Network Code
+	LAC    uint16 // Location Area Code
+	CellID uint32
 }
