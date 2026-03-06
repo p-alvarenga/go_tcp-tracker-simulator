@@ -43,7 +43,7 @@ go run main.go \
     --ip=127.0.0.1 \ 
     --port=9000 \
     --devices=100 \
-    --interval=2s
+    --tick=2s
 ```
 
 ## Running the simulator
