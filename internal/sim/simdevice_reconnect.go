@@ -22,7 +22,7 @@ func (sd *SimulatedDevice) reconnectLoop() error {
 
 		attempt++
 
-		err := sd.Client.TryConnect()
+		err := sd.Session.TryConnect()
 		if err == nil {
 			sd.logger.Info("Reconnected Successfully", "state", sd.state)
 			return nil

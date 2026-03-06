@@ -1,6 +1,6 @@
 package protocol
 
-func EncodeImeiToBcd(imei string) ([]byte, error) {
+func BcdToASCII(imei string) ([]byte, error) {
 	if len(imei) == 15 {
 		imei += "0"
 	}
@@ -14,15 +14,3 @@ func EncodeImeiToBcd(imei string) ([]byte, error) {
 
 	return bcdImei, nil
 }
-
-// func DecodeBcdImei(payload []byte) (string, error) {
-// 	var imei []byte
-
-// 	for _, b := range payload {
-// 		h := b >> 4
-// 		l := b & 0x0f
-// 		imei = append(imei, h+'0', l+'0')
-// 	}
-
-// 	return string(imei), nil
-// }

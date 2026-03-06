@@ -1,4 +1,4 @@
-package tcp
+package session
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type Client struct {
+type Session struct {
 	conn        net.Conn
 	addr        string
 	connTimeout time.Duration
@@ -27,13 +27,13 @@ type Client struct {
 	logger *slog.Logger
 }
 
-func NewClient(addr string, timeout time.Duration, rootLogger *slog.Logger) (*Client, error) {
+func New(addr string, timeout time.Duration, rootLogger *slog.Logger) (*Session, error) {
 	conn, err := net.DialTimeout("tcp", addr, timeout)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{
+	return &Session{
 		conn:        conn,
 		addr:        addr,
 		connTimeout: timeout,
@@ -42,12 +42,12 @@ func NewClient(addr string, timeout time.Duration, rootLogger *slog.Logger) (*Cl
 		ReadCh: make(chan []byte),
 		done:   make(chan struct{}),
 
-		logger: rootLogger.With(slog.String("layer", "Client")),
+		logger: rootLogger.With(slog.String("layer", "Session")),
 	}, nil
 }
 
-func (c *Client) Start(parentCtx context.Context) {
-	c.ctx, c.cancel = context.WithCancel(parentCtx)
+func (c *Session) Start(ctx context.Context) {
+	c.ctx, c.cancel = context.WithCancel(ctx)
 
 	go c.readLoop()
 	go c.writeLoop()
@@ -58,12 +58,12 @@ func (c *Client) Start(parentCtx context.Context) {
 	close(c.done)
 }
 
-func (c *Client) TryConnect() error {
+func (c *Session) TryConnect() error {
 	var err error
 	c.conn, err = net.DialTimeout("tcp", c.addr, c.connTimeout)
 	return err
 }
 
-func (c *Client) Done() <-chan struct{} {
+func (c *Session) Done() <-chan struct{} {
 	return c.done
 }

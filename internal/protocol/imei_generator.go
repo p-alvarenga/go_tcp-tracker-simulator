@@ -6,27 +6,27 @@ import (
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/domain/device"
 )
 
-type ImeiGenerator struct {
-	tac    string
-	serial int
+type IMEIGenerator struct {
+	TAC    string
+	Serial int
 }
 
-func NewImeiGenerator(tac string, start int) *ImeiGenerator {
-	return &ImeiGenerator{
-		tac:    tac,
-		serial: start,
+func NewIMEIGenerator(tac string, start int) *IMEIGenerator {
+	return &IMEIGenerator{
+		TAC:    tac,
+		Serial: start,
 	}
 }
 
-func (ig *ImeiGenerator) Next() device.Imei {
-	ig.serial++
+func (g *IMEIGenerator) Next() device.IMEI {
+	g.Serial++
 
-	serialStr := fmt.Sprintf("%06d", ig.serial) // 16 == "000016", 12345 == "012345"
-	base := ig.tac + serialStr
+	serialStr := fmt.Sprintf("%06d", g.Serial) // 16 == "000016", 12345 == "012345"
+	base := g.TAC + serialStr
 
 	checkDigit := luhnCheckDigit(base)
 
-	return device.Imei(base + checkDigit)
+	return device.IMEI(base + checkDigit)
 }
 
 func luhnCheckDigit(base string) string {

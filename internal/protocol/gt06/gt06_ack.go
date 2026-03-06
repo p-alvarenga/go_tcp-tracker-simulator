@@ -19,21 +19,21 @@ func ExtractAck(raw []byte) (*AckPacket, error) {
 	packetTypeFlag := raw[3]
 	serialNumber := binary.BigEndian.Uint16(raw[4:6])
 
-	if !protocol.ValidateCrc(raw) {
+	if !protocol.CheckCRC(raw) {
 		return nil, fmt.Errorf("gt06: invalid crc")
 	}
 
 	switch packetTypeFlag {
 	case loginFlag:
 		return &AckPacket{
-			PacketType:   LoginType,
-			SerialNumber: serialNumber,
+			Type:   LoginType,
+			Serial: serialNumber,
 		}, nil
 
 	case locationFlag:
 		return &AckPacket{
-			PacketType:   LocationType,
-			SerialNumber: serialNumber,
+			Type:   LocationType,
+			Serial: serialNumber,
 		}, nil
 
 	default:

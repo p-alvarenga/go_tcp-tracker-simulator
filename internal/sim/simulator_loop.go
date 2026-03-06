@@ -40,7 +40,7 @@ func (s *Simulator) handleEvent(event domain.SimulatorEvent) {
 
 	case domain.EventDisconnected,
 		domain.EventStartReconnection:
-		s.logger.Warn("Device Client started reconnection", "state", sd.state)
+		s.logger.Warn("Session started reconnection", "state", sd.state)
 		sd.setState(domain.StateReconnecting)
 
 	case domain.EventProtocolViolation,

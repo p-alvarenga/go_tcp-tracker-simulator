@@ -1,6 +1,6 @@
-package tcp
+package session
 
-func (c *Client) writeLoop() {
+func (c *Session) writeLoop() {
 	for {
 		select {
 		case <-c.ctx.Done():

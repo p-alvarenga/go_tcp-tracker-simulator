@@ -13,16 +13,16 @@ func NewLoginPacket(imei string) (*LoginPacket, error) {
 	}
 
 	return &LoginPacket{
-		Imei:   imei,
+		IMEI:   imei,
 		Serial: 0,
 	}, nil
 }
 
-func (lp *LoginPacket) Type() PacketType {
+func (p LoginPacket) Type() PacketType {
 	return LoginType
 }
 
-func (lp *LoginPacket) Build() ([]byte, error) {
+func (p *LoginPacket) Build() ([]byte, error) {
 	raw := make([]byte, 0, 32)
 
 	raw = append(raw, startFlag[:]...)
@@ -31,15 +31,15 @@ func (lp *LoginPacket) Build() ([]byte, error) {
 		loginFlag,
 	}...)
 
-	bcdImei, err := protocol.EncodeImeiToBcd(lp.Imei)
+	bcdImei, err := protocol.BcdToASCII(p.IMEI)
 	if err != nil {
-		return nil, fmt.Errorf("gt06: Could not encode imei \"%s\" to bcd", lp.Imei)
+		return nil, fmt.Errorf("gt06: Could not encode imei \"%s\" to bcd", p.IMEI)
 	}
 
 	raw = append(raw, bcdImei...) // payload
 
-	raw = binary.BigEndian.AppendUint16(raw, lp.Serial)
-	raw = binary.BigEndian.AppendUint16(raw, protocol.CalculateCrc(raw[2:]))
+	raw = binary.BigEndian.AppendUint16(raw, p.Serial)
+	raw = binary.BigEndian.AppendUint16(raw, protocol.CalculateCRC(raw[2:]))
 
 	raw = append(raw, stopFlag[:]...)
 

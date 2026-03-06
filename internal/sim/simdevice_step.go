@@ -9,10 +9,10 @@ import (
 func (sd *SimulatedDevice) boot() {
 	sd.logger.With("state", sd.getState())
 
-	go sd.ReadClient()
-	go sd.MonitorClient()
+	go sd.ReadSession()
+	go sd.MonitorSession()
 	go sd.loop()
-	go sd.Client.Start(sd.ctx)
+	go sd.Session.Start(sd.ctx)
 
 	sd.logger.Info("booted device")
 

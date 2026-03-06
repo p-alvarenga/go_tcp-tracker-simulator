@@ -6,7 +6,7 @@ type gpsInfo struct {
 	Trusful           bool
 }
 
-func newGpsInfo(quantityOfGpsInfo uint8, realtime, trustful bool) *gpsInfo {
+func newGPSInfo(quantityOfGpsInfo uint8, realtime, trustful bool) *gpsInfo {
 	return &gpsInfo{
 		QuantityOfGpsInfo: quantityOfGpsInfo,
 		RealTime:          realtime,

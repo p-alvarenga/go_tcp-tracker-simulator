@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 )
 
-func CalculateCrc(data []byte) uint16 {
+func CalculateCRC(data []byte) uint16 {
 	var crc uint16 = 0xffff
 
 	for _, b := range data {
@@ -22,8 +22,8 @@ func CalculateCrc(data []byte) uint16 {
 	return crc
 }
 
-func ValidateCrc(data []byte) bool {
+func CheckCRC(data []byte) bool {
 	crc := binary.BigEndian.Uint16(data[6:8])
 
-	return crc == CalculateCrc(data[2:6])
+	return crc == CalculateCRC(data[2:6]) // this should not work this way
 }

@@ -7,15 +7,15 @@ import (
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
 )
 
-func (sd *SimulatedDevice) ReadClient() {
+func (sd *SimulatedDevice) ReadSession() {
 	for {
 		select {
 		case <-sd.ctx.Done():
 			return
 
-		case ack, ok := <-sd.Client.ReadCh:
+		case ack, ok := <-sd.Session.ReadCh:
 			if !ok {
-				sd.logger.Warn("Client read channel was closed")
+				sd.logger.Warn("Session read channel was closed")
 				sd.emit(domain.EventDisconnected)
 
 				return
@@ -27,12 +27,12 @@ func (sd *SimulatedDevice) ReadClient() {
 	}
 }
 
-func (sd *SimulatedDevice) MonitorClient() {
+func (sd *SimulatedDevice) MonitorSession() {
 	for {
 		select {
 		case <-sd.ctx.Done():
 			return
-		case <-sd.Client.Done():
+		case <-sd.Session.Done():
 			st := sd.getState()
 
 			if st != domain.StateReconnecting && st != domain.StateConnected {
@@ -79,7 +79,7 @@ func (sd *SimulatedDevice) translateAck(raw []byte) domain.SimulatorEventType {
 
 func (sd *SimulatedDevice) emit(eventType domain.SimulatorEventType) {
 	sd.simulator.emit(domain.SimulatorEvent{
-		Id:   sd.Device.Imei,
+		Id:   sd.Device.IMEI,
 		Type: eventType,
 		Time: time.Now(),
 	})

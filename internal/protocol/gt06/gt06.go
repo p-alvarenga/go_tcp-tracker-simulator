@@ -23,12 +23,12 @@ type Packet interface {
 }
 
 type AckPacket struct {
-	PacketType   PacketType
-	SerialNumber uint16
+	Type   PacketType
+	Serial uint16
 }
 
 type LoginPacket struct {
-	Imei   string
+	IMEI   string
 	Serial uint16
 }
 
@@ -37,9 +37,9 @@ type LocationPacket struct {
 }
 
 func (lp *LoginPacket) ReceiveAck(ack *AckPacket) bool {
-	return ack.PacketType == LoginType && ack.SerialNumber == lp.Serial
+	return ack.Type == LoginType && ack.Serial == lp.Serial
 }
 
 func (lp *LocationPacket) ReceiveAck(ack *AckPacket) bool {
-	return ack.PacketType == LocationType && ack.SerialNumber == lp.Serial
+	return ack.Type == LocationType && ack.Serial == lp.Serial
 }

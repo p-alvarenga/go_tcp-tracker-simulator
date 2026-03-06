@@ -1,4 +1,4 @@
-package tcp
+package session
 
 import (
 	"log/slog"
@@ -6,7 +6,7 @@ import (
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
 )
 
-func (c *Client) readLoop() {
+func (c *Session) readLoop() {
 	buf := make([]byte, 4096)
 
 	for {
@@ -24,11 +24,11 @@ func (c *Client) readLoop() {
 		}
 
 		c.readBuf = buf[:n]
-		c.processBuffer()
+		c.frameBuffer()
 	}
 }
 
-func (c *Client) processBuffer() {
+func (c *Session) frameBuffer() {
 	var frame []byte
 	var ok bool
 	for {

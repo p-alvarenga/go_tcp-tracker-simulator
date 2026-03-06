@@ -40,8 +40,8 @@ func defaultDeviceConfig() *deviceConfig {
 	return &deviceConfig{
 		InitialState: domain.StateCreated,
 
-		ImeiTacBase:     "12345678",
-		ImeiSerialStart: 1,
+		IMEITacBase:     "12345678",
+		IMEISerialStart: 1,
 
 		Location: locationConfig{
 			Enabled: true,
