@@ -1,6 +1,6 @@
 package device
 
-type state struct {
+type DeviceState struct {
 	Speed    uint
 	Course   uint
 	Ignition bool

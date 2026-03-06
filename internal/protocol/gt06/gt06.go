@@ -1,45 +1,24 @@
 package gt06
 
-type PacketType int
+type PacketType byte
 
 var (
-	startFlag = [2]byte{0x78, 0x78}
-	stopFlag  = [2]byte{0x0D, 0x0A}
+	startBytes = [2]byte{0x78, 0x78}
+	stopBytes  = [2]byte{0x0D, 0x0A}
 )
 
 const (
-	loginFlag    byte = 0x01
-	locationFlag byte = 0x12
-)
-
-const (
-	LoginType PacketType = iota
-	LocationType
+	LoginType    PacketType = 0x01
+	LocationType PacketType = 0x12
 )
 
 type Packet interface {
+	Type() PacketType
+	Serial() uint16
+
 	Build() ([]byte, error)
-	ReceiveAck(*AckPacket) bool
 }
 
-type AckPacket struct {
-	Type   PacketType
-	Serial uint16
-}
-
-type LoginPacket struct {
-	IMEI   string
-	Serial uint16
-}
-
-type LocationPacket struct {
-	Serial uint16
-}
-
-func (lp *LoginPacket) ReceiveAck(ack *AckPacket) bool {
-	return ack.Type == LoginType && ack.Serial == lp.Serial
-}
-
-func (lp *LocationPacket) ReceiveAck(ack *AckPacket) bool {
-	return ack.Type == LocationType && ack.Serial == lp.Serial
+func CheckACK(pkt Packet, ack *ACKPacket) bool {
+	return pkt.Type() == ack.Type() && pkt.Serial() == ack.Serial()
 }

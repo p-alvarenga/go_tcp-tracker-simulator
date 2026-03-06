@@ -28,13 +28,7 @@ type Session struct {
 }
 
 func New(addr string, timeout time.Duration, rootLogger *slog.Logger) (*Session, error) {
-	conn, err := net.DialTimeout("tcp", addr, timeout)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Session{
-		conn:        conn,
 		addr:        addr,
 		connTimeout: timeout,
 
@@ -46,24 +40,31 @@ func New(addr string, timeout time.Duration, rootLogger *slog.Logger) (*Session,
 	}, nil
 }
 
-func (c *Session) Start(ctx context.Context) {
-	c.ctx, c.cancel = context.WithCancel(ctx)
+func (s *Session) Start(ctx context.Context) {
+	s.ctx, s.cancel = context.WithCancel(ctx)
 
-	go c.readLoop()
-	go c.writeLoop()
+	err := s.TryConnect()
+	if err != nil {
+		s.logger.Error("Could not connect", "err", err)
+		s.cancel()
+		return
+	}
 
-	<-c.ctx.Done() // wait until c.cancel()
+	go s.readLoop()
+	go s.writeLoop()
 
-	c.conn.Close()
-	close(c.done)
+	<-s.ctx.Done()
+
+	s.conn.Close()
+	close(s.done)
 }
 
-func (c *Session) TryConnect() error {
+func (s *Session) TryConnect() error {
 	var err error
-	c.conn, err = net.DialTimeout("tcp", c.addr, c.connTimeout)
+	s.conn, err = net.DialTimeout("tcp", s.addr, s.connTimeout)
 	return err
 }
 
-func (c *Session) Done() <-chan struct{} {
-	return c.done
+func (s *Session) Done() <-chan struct{} {
+	return s.done
 }

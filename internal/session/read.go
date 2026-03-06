@@ -6,37 +6,37 @@ import (
 	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
 )
 
-func (c *Session) readLoop() {
+func (s *Session) readLoop() {
 	buf := make([]byte, 4096)
 
 	for {
 		select {
-		case <-c.ctx.Done():
+		case <-s.ctx.Done():
 			return
 		default:
 		}
 
-		n, err := c.conn.Read(buf)
+		n, err := s.conn.Read(buf)
 		if err != nil {
-			c.logger.Error("Could not read", slog.Any("err", err))
-			c.cancel()
+			s.logger.Error("Could not read", slog.Any("err", err))
+			s.cancel()
 			return
 		}
 
-		c.readBuf = buf[:n]
-		c.frameBuffer()
+		s.readBuf = buf[:n]
+		s.frameBuffer()
 	}
 }
 
-func (c *Session) frameBuffer() {
+func (s *Session) frameBuffer() {
 	var frame []byte
 	var ok bool
 	for {
-		frame, c.readBuf, ok = gt06.ExtractFrame(c.readBuf)
+		frame, s.readBuf, ok = gt06.ExtractFrame(s.readBuf)
 		if !ok {
 			return
 		}
 
-		c.ReadCh <- frame
+		s.ReadCh <- frame
 	}
 }

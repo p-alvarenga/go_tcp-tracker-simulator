@@ -21,7 +21,7 @@ func (sd *SimulatedDevice) ReadSession() {
 				return
 			}
 
-			ev := sd.translateAck(ack)
+			ev := sd.translateACK(ack)
 			sd.emit(ev)
 		}
 	}
@@ -50,8 +50,8 @@ func (sd *SimulatedDevice) MonitorSession() {
 	}
 }
 
-func (sd *SimulatedDevice) translateAck(raw []byte) domain.SimulatorEventType {
-	ack, err := gt06.ExtractAck(raw)
+func (sd *SimulatedDevice) translateACK(frame []byte) domain.SimulatorEventType {
+	ack, err := gt06.DecodeACK(frame)
 
 	if err != nil || ack == nil {
 		sd.logger.Error("Protocol Violation", "err", err)
@@ -62,15 +62,15 @@ func (sd *SimulatedDevice) translateAck(raw []byte) domain.SimulatorEventType {
 		return domain.EventUnexpectedResponse
 	}
 
-	if !sd.lastPacket.ReceiveAck(ack) {
+	if !gt06.CheckACK(sd.lastPacket, ack) {
 		return domain.EventUnexpectedResponse
 	}
 
-	switch sd.lastPacket.(type) {
-	case *gt06.LoginPacket:
+	switch sd.lastPacket.Type() {
+	case gt06.LoginType:
 		return domain.EventLoginSucceeded
 
-	case *gt06.LocationPacket:
+	case gt06.LocationType:
 		return domain.EventLocationSucceeded
 	}
 
@@ -79,7 +79,7 @@ func (sd *SimulatedDevice) translateAck(raw []byte) domain.SimulatorEventType {
 
 func (sd *SimulatedDevice) emit(eventType domain.SimulatorEventType) {
 	sd.simulator.emit(domain.SimulatorEvent{
-		Id:   sd.Device.IMEI,
+		ID:   sd.Device.IMEI,
 		Type: eventType,
 		Time: time.Now(),
 	})

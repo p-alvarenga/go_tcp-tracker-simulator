@@ -94,7 +94,7 @@ func (s SimulatorEventType) IsValid() bool {
 }
 
 type SimulatorEvent struct {
-	Id   device.IMEI
+	ID   device.IMEI
 	Type SimulatorEventType
 	Time time.Time
 }

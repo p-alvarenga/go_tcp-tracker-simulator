@@ -1,19 +1,19 @@
 package session
 
-func (c *Session) writeLoop() {
+func (s *Session) writeLoop() {
 	for {
 		select {
-		case <-c.ctx.Done():
+		case <-s.ctx.Done():
 			return
 		default:
 		}
 
-		raw := <-c.sendCh // wait until sendCh
+		raw := <-s.sendCh // wait until sendCh
 
-		_, err := c.conn.Write(raw) // configuration
+		_, err := s.conn.Write(raw) // configuration
 		if err != nil {
-			c.logger.Error("Connection returned error", "err", err)
-			c.cancel()
+			s.logger.Error("Connection returned error", "err", err)
+			s.cancel()
 			return
 		}
 	}

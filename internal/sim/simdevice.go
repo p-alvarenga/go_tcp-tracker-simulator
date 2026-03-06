@@ -30,7 +30,7 @@ type SimulatedDevice struct {
 	lastPacket gt06.Packet
 }
 
-func NewSimulatedDevice(sim *Simulator, c *session.Session, d *device.Device, rootLogger *slog.Logger) *SimulatedDevice {
+func NewSimulatedDevice(sim *Simulator, s *session.Session, d *device.Device, rootLogger *slog.Logger) *SimulatedDevice {
 	ctx, cancel := context.WithCancel(sim.ctx)
 
 	logger := rootLogger.With(
@@ -41,7 +41,7 @@ func NewSimulatedDevice(sim *Simulator, c *session.Session, d *device.Device, ro
 	return &SimulatedDevice{
 		simulator: sim,
 		cfg:       &sim.cfg.SimulatedDeviceConfig,
-		Session:   c,
+		Session:   s,
 		Device:    d,
 		ctx:       ctx,
 		cancel:    cancel,

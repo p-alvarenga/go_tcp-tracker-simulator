@@ -8,10 +8,10 @@ type Device struct {
 	IMEI   IMEI
 	Serial int
 
-	State *state
+	State *DeviceState
 
-	Gps *gpsInfo
-	Lbs *lbsInfo
+	GPS *gps
+	LBS *lbs
 
 	logger *slog.Logger
 }

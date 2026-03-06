@@ -25,7 +25,7 @@ func (s *Simulator) emit(ev domain.SimulatorEvent) {
 }
 
 func (s *Simulator) handleEvent(event domain.SimulatorEvent) {
-	sd := s.simulatedDevices[event.Id]
+	sd := s.simulatedDevices[event.ID]
 	if sd == nil {
 		return
 	}
@@ -47,6 +47,6 @@ func (s *Simulator) handleEvent(event domain.SimulatorEvent) {
 		domain.EventUnexpectedResponse,
 		domain.EventInvalid: // probably
 		s.logger.Error("Shutting down device", "event", event.Type)
-		s.shutdownSimulatedDevice(event.Id)
+		s.shutdownSimulatedDevice(event.ID)
 	}
 }
