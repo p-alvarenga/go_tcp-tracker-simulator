@@ -25,21 +25,23 @@ func (sd *SimulatedDevice) loop() {
 
 	for {
 		select {
-		case <-sd.ctx.Done():
-			return
 		case <-ticker.C:
 			st := sd.getState()
 
 			if st != domain.StateDisconnected && st != domain.StateReconnecting {
 				sd.step(st)
 			}
+
+		case <-sd.ctx.Done():
+			return
 		}
 	}
 }
 
 func (sd *SimulatedDevice) step(state domain.SimulatedDeviceState) {
 	switch state {
-	case domain.StateConnected:
+	case domain.StateConnected,
+		domain.StateCreated:
 		err := sd.SendLogin()
 		if err != nil {
 			sd.logger.Error("Could not send login packet")

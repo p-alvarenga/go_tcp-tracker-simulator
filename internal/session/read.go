@@ -24,11 +24,11 @@ func (s *Session) readLoop() {
 		}
 
 		s.readBuf = buf[:n]
-		s.frameBuffer()
+		s.processBuffer()
 	}
 }
 
-func (s *Session) frameBuffer() {
+func (s *Session) processBuffer() {
 	var frame []byte
 	var ok bool
 	for {
@@ -37,6 +37,12 @@ func (s *Session) frameBuffer() {
 			return
 		}
 
-		s.ReadCh <- frame
+		ack, err := gt06.DecodeACK(frame)
+		if err != nil {
+			s.logger.Error("Error decoding ACK Packet", "err", err)
+			continue
+		}
+
+		s.ACKCh <- ack
 	}
 }

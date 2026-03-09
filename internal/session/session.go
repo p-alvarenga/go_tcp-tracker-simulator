@@ -6,6 +6,8 @@ import (
 	"net"
 	"sync"
 	"time"
+
+	"github.com/p-alvarenga/go_tcp-tracker-simulator/internal/protocol/gt06"
 )
 
 type Session struct {
@@ -14,7 +16,7 @@ type Session struct {
 	connTimeout time.Duration
 
 	sendCh chan []byte // buffered (32) - make(chan []byte, 32)
-	ReadCh chan []byte
+	ACKCh  chan *gt06.ACKPacket
 	done   chan struct{}
 
 	readBuf []byte
@@ -33,7 +35,7 @@ func New(addr string, timeout time.Duration, rootLogger *slog.Logger) (*Session,
 		connTimeout: timeout,
 
 		sendCh: make(chan []byte, 32),
-		ReadCh: make(chan []byte),
+		ACKCh:  make(chan *gt06.ACKPacket),
 		done:   make(chan struct{}),
 
 		logger: rootLogger.With(slog.String("layer", "Session")),

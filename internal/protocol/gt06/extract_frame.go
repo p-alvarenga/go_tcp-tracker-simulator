@@ -6,16 +6,10 @@ func ExtractFrame(buf []byte) ([]byte, []byte, bool) {
 	start := bytes.Index(buf, startBytes[:])
 
 	if start == -1 {
-		switch len(buf) {
-		case 0:
-			return nil, buf[:0:0], false
-
-		case 1:
-			return nil, buf[:1:1], false
-
-		default:
-			return nil, buf[len(buf)-1 : len(buf) : len(buf)], false
+		if len(buf) > 1 {
+			buf = buf[len(buf)-1:]
 		}
+		return nil, buf[:len(buf):len(buf)], false
 	}
 
 	end := bytes.Index(buf[start+2:], stopBytes[:])

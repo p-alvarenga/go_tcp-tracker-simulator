@@ -13,7 +13,9 @@ func (sd *SimulatedDevice) ReadSession() {
 		case <-sd.ctx.Done():
 			return
 
-		case ack, ok := <-sd.Session.ReadCh:
+		case ack, ok := <-sd.Session.ACKCh:
+			sd.logger.Info("Reading ACK: ", "ack", ack)
+
 			if !ok {
 				sd.logger.Warn("Session read channel was closed")
 				sd.emit(domain.EventDisconnected)
@@ -50,19 +52,14 @@ func (sd *SimulatedDevice) MonitorSession() {
 	}
 }
 
-func (sd *SimulatedDevice) translateACK(frame []byte) domain.SimulatorEventType {
-	ack, err := gt06.DecodeACK(frame)
-
-	if err != nil || ack == nil {
-		sd.logger.Error("Protocol Violation", "err", err)
-		return domain.EventProtocolViolation
-	}
-
+func (sd *SimulatedDevice) translateACK(ack *gt06.ACKPacket) domain.SimulatorEventType {
 	if sd.lastPacket == nil {
 		return domain.EventUnexpectedResponse
 	}
 
-	if !gt06.CheckACK(sd.lastPacket, ack) {
+	err := gt06.CheckACK(ack, sd.lastPacket)
+	if err != nil {
+		sd.logger.Error("Could not translate ack", "err", err)
 		return domain.EventUnexpectedResponse
 	}
 
