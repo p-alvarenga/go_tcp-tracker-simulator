@@ -1,9 +1,13 @@
 package device
 
 import (
-	"context"
+	"go_tcp-tracker-simulator/internal/config"
 	"go_tcp-tracker-simulator/internal/domain"
+	"go_tcp-tracker-simulator/internal/protocol"
+	"hash/fnv"
 	"log/slog"
+	"math/rand"
+	"time"
 )
 
 type Device struct {
@@ -11,30 +15,55 @@ type Device struct {
 	SessionID domain.SessionID
 	State     domain.DeviceState
 
-	ctx    context.Context
-	cancel context.CancelFunc
+	cfg *config.DeviceConfig
+
+	sink chan<- DeviceEvent
+
+	rng      *rand.Rand
+	nextTick time.Time
 
 	logger *slog.Logger
-
-	// Simulation Config
-	// Telemetry *Telemetry
 }
 
-func newDevice(imei domain.IMEI, sessionID domain.SessionID, parentCtx context.Context, rootLogger *slog.Logger) *Device {
-	ctx, cancel := context.WithCancel(parentCtx)
-
+func newDevice(imei domain.IMEI, sessionID domain.SessionID, sink chan<- DeviceEvent, cfg *config.DeviceConfig, rootLogger *slog.Logger) *Device {
 	return &Device{
 		IMEI:      imei,
 		SessionID: sessionID,
-		State:     domain.StateDeviceCreated,
+		cfg:       cfg,
 
-		ctx:    ctx,
-		cancel: cancel,
+		State: domain.StateDeviceCreated,
+		sink:  sink,
+
+		rng: rand.New(rand.NewSource(int64(hashIMEI(imei)))),
 
 		logger: rootLogger.With("lyr", "device"),
 	}
 }
 
-func (d *Device) run() {
+func (d *Device) emit(kind domain.DeviceEventType, pkt protocol.Packet) {
+	d.sink <- DeviceEvent{
+		Kind:      kind,
+		IMEI:      d.IMEI,
+		SessionID: d.SessionID,
+		Packet:    pkt,
+		Time:      time.Now(),
+	}
+}
 
+func (d *Device) emitError(err error) {
+	d.sink <- DeviceEvent{
+		Kind:      domain.EventDeviceError,
+		IMEI:      d.IMEI,
+		SessionID: d.SessionID,
+		Packet:    nil,
+		Error:     err,
+		Time:      time.Now(),
+	}
+}
+
+func (d *Device) setState(st domain.DeviceState) { d.State = st }
+func hashIMEI(imei domain.IMEI) int64 {
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(imei))
+	return int64(h.Sum32())
 }

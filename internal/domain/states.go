@@ -1,18 +1,26 @@
 package domain
 
-type DeviceState uint64
-type SessionState uint64
-
+// Device
 const (
 	StateDeviceCreated DeviceState = iota
 	StateDeviceStopped
-	StateDeviceAwaitingLogin
-	StateDeviceLocation
-	StateDeviceHeartbeat
+
+	StateDeviceWaitingConnection
+
+	StateDeviceConnected
+	StateDeviceDisconnected
+
+	StateDeviceNotLogged
+	StateDeviceSendLocation  // keep sending location packet
+	StateDeviceSendHeartbeat // keep sending heartbeat
+
 )
 
+// Session
 const (
-	StateSessionConnected SessionState = iota
+	StateSessionCreated SessionState = iota
+	StateSessionConnected
+	StateSessionDisconnected
 	StateSessionReconnecting
 	StateSessionClosed
 )

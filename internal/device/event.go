@@ -2,6 +2,7 @@ package device
 
 import (
 	"go_tcp-tracker-simulator/internal/domain"
+	"go_tcp-tracker-simulator/internal/protocol"
 	"time"
 )
 
@@ -11,11 +12,8 @@ type DeviceEvent struct {
 	IMEI      domain.IMEI
 	SessionID domain.SessionID
 
-	Login *LoginPayload
+	Packet protocol.Packet
+	Error  error
 
 	Time time.Time
-}
-
-func NewDeviceEvent() *DeviceEvent {
-	return nil
 }
